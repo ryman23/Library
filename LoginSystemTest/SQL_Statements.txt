@@ -1,0 +1,161 @@
+Book files
+-------------------------------------------------------------------------------------------------------------------------------------------------
+// Query for current user's email
+	$sql = "Select * from patron where email ='$currentUserEmail'";
+
+// Query for first open copy
+	$sql1 = "Select * from books where bookID NOT IN (Select bookID from borrowed)AND isbn = $bookISBN Limit 1";
+	
+// Insert query in borrowed table
+	$sql = "INSERT INTO `borrowed`(`bookID`,`cardNumber`,`checkOutDate`,`dueDate`) VALUES ('$bookID','$userCardNumber','$currentDateTime','$year-$month-$day')";	
+	
+	
+include files
+-------------------------------------------------------------------------------------------------------------------------------------------------
+//Query book info
+	$sql = "SELECT books.authorID,author.authorID, author.afname, books.isbn, author.alname,books.title,books.quantity,books.bookID
+	FROM books
+	INNER JOIN author
+	ON books.authorID = author.authorID WHERE books.isbn = $bookISBN
+	GROUP BY author.alname";
+	
+/// Available copies query
+	$sql = "Select * from books where bookID NOT IN (Select bookID from borrowed)AND isbn = $bookISBN";
+	
+// Assign CardNumber
+	$sql = "Select * from patron where email ='$currentUserEmail'";
+	
+// check if cardID in borrowed > 5;
+	$sql1 = "SELECT COUNT(*) FROM borrowed where cardNumber = $userCardNumber";
+	
+// Query for current user's email
+	$sql = "SELECT * FROM patron WHERE email ='$email'";
+
+// Run SQL to find if the current user email has admin privileges.
+	$sql = "SELECT * FROM patron WHERE email = '$email' AND isAdmin = 1";
+
+// Query for current user's email	
+	$sql = "SELECT * FROM patron WHERE email='$email'";
+
+//Insert the user into the DB
+	$sql2 = "INSERT INTO patron(pFname,pLname,phone, email, password) VALUES ('$first', '$last', '$phone', '$email', '$hashedPassword')";
+	$sql3 = "INSERT INTO creditcards(creditCard,pFname,pLname) Values ('$cc', '$first', '$last')";
+	$sql4 = "UPDATE creditcards C, patron P SET C.cardNumber = P.cardNumber WHERE C.pFname = P.pFname AND C.pLname = P.pLname";
+	$sql5 = "INSERT INTO address(state,city,zip,pLname,pFname) Values ('$state', '$city', '$zip', '$first', '$last')";
+	$sql6 = "UPDATE address A, patron P SET A.cardNumber = P.cardNumber WHERE A.pFname = P.pFname AND A.pLname = P.pLname";
+	
+Account File
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+// Run SQL to find if the current user email has admin privileges.
+	$sql = "SELECT * FROM patron WHERE email = '$email' AND isAdmin = 1";
+
+// Get user info	
+	$sql = "Select * from patron where email ='$currentUserEmail'";
+
+// Get cardnumber 
+	$sql = "Select *
+	from borrowed
+	where cardNumber = $userCardNumber";
+
+Add Book File
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+// Run SQL to find if the current user email has admin privileges.
+	$sql = "SELECT * FROM patron WHERE email = '$email' AND isAdmin = 1";
+	
+// Add Author
+	$sql = "INSERT INTO author(afname,alname) 
+		VALUES 
+		('$_POST[afname]', '$_POST[alname]')";
+		
+		
+// Add each book
+	$sql = "INSERT INTO books(isbn,title,authorID,quantity) 
+	VALUES 
+	('$_POST[isbn]', '$_POST[title]','$_POST[authorID]','$_POST[quantity]')";
+
+Bookcheck Out
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+// Get user info
+	$sql = "Select * from patron where email ='$currentUserEmail'";
+	
+// check if cardID in borrowed > 5;
+	$sql = "SELECT COUNT(*) FROM borrowed where cardNumber = $userCardNumber";
+	
+// Insert query
+	$sql = "INSERT INTO `borrowed`(`bookID`,`cardNumber`,`checkOutDate`,`dueDate`) VALUES ('$bookID','$userCardNumber','$currentDateTime','$year-$month-$day')";
+	
+Book return file
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+// Insert info into returned and delete from borrowed
+	$sql="INSERT INTO returned (bookID,cardNumber,checkOutDate,dueDate)
+	SELECT bookID,cardNumber,checkOutDate,dueDate
+	FROM borrowed
+	WHERE '$_POST[bookID]' = borrowed.bookID;";
+
+	$sql2 = "DELETE FROM borrowed WHERE bookID='$_POST[bookID]';";
+	
+// Check for late books
+	$sql4 = "UPDATE returned
+				SET late = true
+				WHERE dueDate < ReturnDate";
+
+Books file
+------------------------------------------------------------------------------------------------------------------------------------------------
+// Book Catalog Query
+	$query = "SELECT books.authorID,author.authorID, author.afname, books.isbn, author.alname,books.title,books.quantity,books.bookID
+					FROM books
+					INNER JOIN author
+					ON books.authorID = author.authorID";
+					
+Checkout History file
+------------------------------------------------------------------------------------------------------------------------------------------------	
+// Query for checkout History
+	$sql ="Select returned.bookID, books.bookID, books.title,books.authorID,returned.cardNumber,returned.checkOutDate,returned.dueDate,returned.ReturnDate,returned.late
+		FROM returned
+		INNER join books on returned.bookID=books.bookID";
+		
+itemsCheckedOut file
+------------------------------------------------------------------------------------------------------------------------------------------------			
+// Items checkedout
+	$sql = "Select *
+	from books
+	where bookID IN (Select bookID from borrowed);";
+	
+	
+items in file
+------------------------------------------------------------------------------------------------------------------------------------------------	
+// items in 
+	$sql = "Select *
+	from books
+	where bookID NOT IN (Select bookID from borrowed);";
+	
+	
+Patrons
+------------------------------------------------------------------------------------------------------------------------------------------------	
+// Get patron info
+	$sql = "SELECT patron.cardNumber,patron.pFname,patron.pLname,patron.email,patron.phone,patron.Fines,address.cardNumber,address.state,address.city,address.zip
+	FROM patron
+	INNER JOIN address ON patron.cardNumber = address.cardNumber;";
+
+	
+Remove Patron
+------------------------------------------------------------------------------------------------------------------------------------------------	
+	// New All Patron Records
+	$sql="DELETE FROM patron WHERE cardNumber='$_POST[bookID]';";
+	$sql2 = "DELETE FROM borrowed WHERE cardNumber='$_POST[bookID]';";
+	$sql2 = "DELETE FROM address WHERE cardNumber='$_POST[bookID]';";
+	$sql3 = "DELETE FROM creditcards WHERE cardNumber='$_POST[bookID]';";
+	$sql4 = "DELETE FROM returned WHERE cardNumber='$_POST[bookID]';";
+	
+	
+Remove Book
+------------------------------------------------------------------------------------------------------------------------------------------------	
+	// delete book
+	$sql="DELETE FROM books WHERE bookID='$_POST[bookID]';";
+
+	$sql2 = "DELETE FROM borrowed WHERE bookID='$_POST[bookID]';";
+		
